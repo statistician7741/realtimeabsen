@@ -1,106 +1,128 @@
-var PORT = 55555;
-var HOST = '127.0.0.1';
+//error handling
+process.on('uncaughtException', function (err) {
+  // handle the error safely
+  console.log(400, ' Start Error Message: ', err)
+  // send email
 
-var dgram = require('dgram');
-var server = dgram.createSocket('udp4');
-const edge = require('edge-js');
-
-server.on('listening', function () {
-  var address = server.address();
-  console.log('UDP Server listening on ' + address.address + ':' + address.port);
 });
 
-var getVerify = edge.func(function () {/*
-  async (msg) => {
-      byte[] buffer = (byte[]) msg;
-      ulong uint64 = BitConverter.ToUInt64(buffer, 16);
-      return (int) ((long) (uint64 >> 20) & 31L);
-  }
-*/});
+//SIPEDE Server
+const express = require('express')
+const http = require('http')
+const next = require('next')
+const socketServer = require('socket.io')
 
-var getYear = edge.func(function () {/*
-  async (msg) => {
-      byte[] buffer = (byte[]) msg;
-      ulong uint64 = BitConverter.ToUInt64(buffer, 16);
-      return (int) ((long) uint64 & (long) sbyte.MaxValue) + 2000;
-  }
-*/});
+let runServer = () => {
+  const port = 82
+  const dev = process.env.NODE_ENV !== 'production'
+  const app = next({ dev })
+  const handle = app.getRequestHandler()
 
-var getMonth = edge.func(function () {/*
-  async (msg) => {
-      byte[] buffer = (byte[]) msg;
-      ulong uint64 = BitConverter.ToUInt64(buffer, 16);
-      return (int) ((long) (uint64 >> 7) & 15L);
-  }
-*/});
+  app.prepare()
+    .then(() => {
+      const server = express()
+      const cookieParser = require("cookie-parser");
+      const bodyParser = require("body-parser");
+      var session = require('express-session')({
+        resave: true,
+        saveUninitialized: true,
+        secret: "ID==&&%^&A&SHBJSAsjhbJGhUGkbKiUvii^%^#$%^&98G8UIugg=="
+      });
+      var sharedsession = require("express-socket.io-session");
+      server.use(session);
+      server.use(cookieParser("ID==&&%^&A&SHBJSAsjhbJGhUGkbKiUvii^%^#$%^&98G8UIugg=="));
+      server.use(bodyParser.urlencoded({ extended: true }));
+      server.use(bodyParser.json())
 
-var getDay = edge.func(function () {/*
-  async (msg) => {
-      byte[] buffer = (byte[]) msg;
-      ulong uint64 = BitConverter.ToUInt64(buffer, 16);
-      return (int) ((long) (uint64 >> 11) & 31L);
-  }
-*/});
+      //socket.io
+      const serve = http.createServer(server);
 
-var getHour = edge.func(function () {/*
-  async (msg) => {
-      byte[] buffer = (byte[]) msg;
-      ulong uint64 = BitConverter.ToUInt64(buffer, 16);
-      return (int) ((long) (uint64 >> 47) & 31L);
-  }
-*/});
+      // server.use('/api/login', require("./api/login.api"));
 
-var getMin = edge.func(function () {/*
-  async (msg) => {
-      byte[] buffer = (byte[]) msg;
-      ulong uint64 = BitConverter.ToUInt64(buffer, 16);
-      return (int) ((long) (uint64 >> 52) & 63L);
-  }
-*/});
+      //Kompresi gzip
+      const compression = require('compression');
+      server.use(compression());
 
-var getSec = edge.func(function () {/*
-  async (msg) => {
-      byte[] buffer = (byte[]) msg;
-      ulong uint64 = BitConverter.ToUInt64(buffer, 16);
-      return (int) ((long) (uint64 >> 58) & 63L);
-  }
-*/});
+      server.get('*', (req, res) => {
+        return handle(req, res)
+      })
+      serve.listen(port, (err) => {
+        if (err) throw err
+        console.log(`> Ready on https://localhost:${port}`)
+      })
 
-var getUserID = edge.func(function () {/*
-  async (msg) => {
-      byte[] buffer = (byte[]) msg;
-      ulong uint64 = BitConverter.ToUInt64(buffer, 8);
-      return uint64.ToString();
-  }
-*/});
+      const io = socketServer(serve);
+      io.use(sharedsession(session, cookieParser("ID==&&%^&A&SHBJSAsjhbJGhUGkbKiUvii^%^#$%^&98G8UIugg==")));
+      io.on('connection', function (client) {
+        console.log("Hey, someone connected");
+        // require('./api/socket/penilaian.api.socket')(client, all_connected_clients)
+        client.on('disconnect', () => {
+          console.log("Hey, someone disconnected");
+        })
+      })
 
-const setVal = (msg, func, name) => {
-  func(msg, function(e, r){
-    if (e) throw error;
-    console.log(name, r);
-    return r
-  })
+      //udp server
+      const dgram = require('dgram');
+      const udpServer = dgram.createSocket('udp4');
+      const PORT = 9999;
+      const f = require('./app');
+      const async = require('async');
+      const moment = require('moment');
+      udpServer.on('listening', function () {
+        const  address = udpServer.address();
+        console.log('UDP udpServer listening on ' + address.address + ':' + address.port);
+      });
+      udpServer.bind(PORT);
+      udpServer.on('message', (data, remote) => {
+        let year, month, day, hour, min, sec, UserID;
+        async.auto({
+          id: (cb_1)=>{
+            f.setVal(data, f.getUserID, cb_1);
+          },
+          year: (cb_1)=>{
+            f.setVal(data, f.getYear, cb_1);
+          },
+          month: (cb_1)=>{
+            f.setVal(data, f.getMonth, cb_1);
+          },
+          day: (cb_1)=>{
+            f.setVal(data, f.getDay, cb_1);
+          },
+          hour: (cb_1)=>{
+            f.setVal(data, f.getHour, cb_1);
+          },
+          min: (cb_1)=>{
+            f.setVal(data, f.getMin, cb_1);
+          },
+          sec: (cb_1)=>{
+            f.setVal(data, f.getSec, cb_1);
+          }
+        }, (err, log)=>{
+          console.log(log);
+          io.sockets.emit('checkin', {
+            id: log.id, time: moment(`${log.year}/${log.month}/${log.day} ${log.hour}:${log.min}:${log.sec}`, 'YYYY/M/D HH:mm:ss')
+          });
+        })
+      });
+    })
 }
 
-server.on('message', (data, remote) => {
-  let year, month, day, hour, min, sec, UserID;
-  console.log('=======================');
-  setVal(data, getUserID, 'User: ');
-  console.log('----------');
-  setVal(data, getYear, 'YYYY: ');
-  setVal(data, getMonth, 'M: ');
-  setVal(data, getDay, 'D: ');
-  console.log('----------');
-  setVal(data, getHour, 'HH: ');
-  setVal(data, getMin, 'mm: ');
-  setVal(data, getSec, 'ss: ');
-  console.log('=======================');
+//modul mongodb utk koneksi mongo db database
+var url = 'mongodb://127.0.0.1:27017/presensi';
+var mongoose = require('mongoose');
+const { exec } = require('child_process');
 
-  // var uint64 = new Uint64BE(message, 16);
-  // const year = (uint64 & 127) + 2000;
-  // console.log(year); // "90a0b0c0d0e0f10"
-  //(int) ((long) uint64 & (long) 127) + 2000;
-  // console.log(remote.address + ':' + remote.port + ' - ' + message);
-});
+let start = () => {
+  mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
+    if (err) {
+      exec(`powershell -Command "Start-Process cmd -Verb RunAs -ArgumentList '/c net start MongoDB'"`, (err, stdout, stderr) => {
+        console.log('Trying to start MongoDB service...');
+        setTimeout(start, 15000)
+      })
+    } else {
+      runServer();
+    }
+  });
+}
 
-server.bind(PORT);
+start();
