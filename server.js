@@ -69,39 +69,42 @@ let runServer = () => {
       const async = require('async');
       const moment = require('moment');
       udpServer.on('listening', function () {
-        const  address = udpServer.address();
+        const address = udpServer.address();
         console.log('UDP udpServer listening on ' + address.address + ':' + address.port);
       });
       udpServer.bind(PORT);
       udpServer.on('message', (data, remote) => {
         let year, month, day, hour, min, sec, UserID;
         async.auto({
-          id: (cb_1)=>{
+          id: (cb_1) => {
             f.setVal(data, f.getUserID, cb_1);
           },
-          year: (cb_1)=>{
+          year: (cb_1) => {
             f.setVal(data, f.getYear, cb_1);
           },
-          month: (cb_1)=>{
+          month: (cb_1) => {
             f.setVal(data, f.getMonth, cb_1);
           },
-          day: (cb_1)=>{
+          day: (cb_1) => {
             f.setVal(data, f.getDay, cb_1);
           },
-          hour: (cb_1)=>{
+          hour: (cb_1) => {
             f.setVal(data, f.getHour, cb_1);
           },
-          min: (cb_1)=>{
+          min: (cb_1) => {
             f.setVal(data, f.getMin, cb_1);
           },
-          sec: (cb_1)=>{
+          sec: (cb_1) => {
             f.setVal(data, f.getSec, cb_1);
           }
-        }, (err, log)=>{
-          console.log(log);
-          io.sockets.emit('checkin', {
-            id: log.id, time: moment(`${log.year}/${log.month}/${log.day} ${log.hour}:${log.min}:${log.sec}`, 'YYYY/M/D HH:mm:ss')
-          });
+        }, (err, log) => {
+          let checkInDate = moment(`${log.year}/${log.month}/${log.day} ${log.hour}:${log.min}:${log.sec}`, 'YYYY/M/D HH:mm:ss')
+          if (!checkInDate.isBefore(moment().subtract(2, 'second'))) {
+            console.log(log.id, checkInDate.format('YYYY/MM/DD hh:mm:ss'));
+            io.sockets.emit('checkin', {
+              id: log.id, time: checkInDate
+            });
+          }
         })
       });
     })
