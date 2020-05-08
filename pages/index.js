@@ -8,28 +8,32 @@ moment.locale('id')
 
 const { Title } = Typography;
 
-const user = {
-  '1': {
-    name: 'Admin'
-  },
-  '53': {
-    name: 'Muh. Shamad, SST'
-  },
-  '3': {
-    name: 'Yunita Nur Khasanah, SST'
-  }
-}
-
 class Index extends React.Component {
   state = {
     isFull: false,
     time: moment(),
-    data: [{ id: '53', name: user['53'].name, time: moment() }]
+    user: [
+      {
+        id: 1,
+        name: 'Admin',
+        presensi: []
+      },
+      {
+        id: 53,
+        name: 'Muh. Shamad, SST',
+        presensi: []
+      },
+      {
+        id: 3,
+        name: 'Yunita Nur Khasanah, SST',
+        presensi: []
+      }
+    ]
   }
   handleCheckIn = (newData) => {
     console.log(newData);
     this.setState({
-      data: [...this.state.data, { id: newData.id, name: user[newData.id].name, time: moment(newData.time) }]
+      user: [...this.state.data, { id: newData.id, name: user[newData.id].name, time: moment(newData.time) }]
     })
   }
   componentDidMount = () => {
@@ -42,7 +46,7 @@ class Index extends React.Component {
     clearInterval(this.interval);
   }
   render() {
-    const { time, data, isFull } = this.state;
+    const { time, user, isFull } = this.state;
     return <Fragment>
       <Fullscreen
         enabled={this.state.isFull}
@@ -56,80 +60,15 @@ class Index extends React.Component {
           </Col>
         </Row>
         <Row gutter={8}>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#F24B59" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-        </Row>
-        <Row gutter={8}>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#F24B59" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#09A603" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#09A603" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-        </Row>
-        <Row gutter={8}>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#F24B59" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#09A603" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#F24B59" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-        </Row>
-        <Row gutter={8}>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#F24B59" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#09A603" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-        </Row>
-        <Row gutter={8}>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#F24B59" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
-          <Col span={4}>
-            {data.map(d => <Card style={{ backgroundColor: "#09A603" }}>
-              <span>{d.name}</span>
-              <span>{d.time.format('YYYY/MM/DD HH:mm:ss')}</span>
-            </Card>)}
-          </Col>
+          {user.map(d =>
+            <Col span={4}>
+              <Card bodyStyle={{ backgroundColor: `${d}`, padding: 5 }}>
+                <span>{d.name}</span><br />
+                <span>{d.time}</span><br />
+                <span>{d.time}</span>
+              </Card>
+            </Col>
+          )}
         </Row>
       </Fullscreen>
     </Fragment>
