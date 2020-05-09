@@ -111,10 +111,12 @@ let runServer = () => {
               if (e) {
                 console.log(e);
               } else {
-                r.presensi[r.presensi.length-1].handkey_time.push(checkInDate.format('YYYY/MM/DD HH:mm:ss'))
-                console.log(r.presensi);
-                r.save()
-                console.log(log.id_fingerprint, checkInDate.format('YYYY/MM/DD HH:mm:ss'));
+                if (r.presensi[r.presensi.length - 1]._id === moment().format('YYYY_MM_DD')) {
+                  r.presensi[r.presensi.length - 1].handkey_time.push(checkInDate.format('YYYY/MM/DD HH:mm:ss'))
+                  console.log(r.presensi);
+                  r.save()
+                  console.log(log.id_fingerprint, checkInDate.format('YYYY/MM/DD HH:mm:ss'));
+                }
               }
             })
           }

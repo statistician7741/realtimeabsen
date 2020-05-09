@@ -2,8 +2,8 @@ const Organik = require('../models/organik.model')
 const moment = require('moment');
 
 function applyToClient(client) {
-    const _id = moment().format('YYYY_MM_DD')
     client.on('api.socket.organik/s/getOrganikAll', (cb) => {
+        const _id = moment().format('YYYY_MM_DD')
         Organik.updateMany({
             'isProv': false,
             '$and': [

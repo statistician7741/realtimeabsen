@@ -278,12 +278,14 @@ class Index extends React.Component {
         onChange={isFull => this.setState({ isFull })}
         style={{ background: 'inherit' }}
       >
-        <Row justify="center" align="bottom" gutter={16} onClick={() => this.setState({ isFull: !isFull })} style={{ paddingTop: 20 }}>
+        <Row justify="center" align="bottom" gutter={16} onClick={() => this.setState({ isFull: !isFull })}>
           <Col>
             <span style={{ fontSize: 20 }}><strong>{time.format('dddd, DD MMMM YYYY')}</strong></span>
           </Col>
           <Col>
-            <span style={{ fontSize: 40 }}><strong>{time.format('HH:mm:ss')}</strong></span>
+            <span style={{ fontSize: 60, color: `${time.isAfter(moment(time).hour(16).minute(time.day() === 5 ? 30 : 0).second(0)) || time.isBefore(moment(time).hour(7).minute(29).second(59)) ? '#87BF4E' : '#F26E22'}` }}>
+              <strong>{time.format('HH:mm:ss')}</strong>
+            </span>
           </Col>
           <Col>
             <Badge status={`${isOnline ? 'processing' : 'error'}`} text={`Mesin Presensi ${isOnline ? 'Online' : 'Offline'}`} />
@@ -309,7 +311,7 @@ class Index extends React.Component {
         <div style={{ paddingLeft: 10 }}>
           Keterangan:<br />
           <div style={{ display: 'inline-block' }}>
-            <div style={{ width: 30, height: 15, background: '#FF7772', display: 'inline-block', verticalAlign: 'middle' }}></div> : Tidak Hadir&emsp;
+            <div style={{ width: 30, height: 15, background: '#FF7772', display: 'inline-block', verticalAlign: 'middle' }}></div> : Belum Hadir&emsp;
         </div>
           <div style={{ display: 'inline-block' }}>
             <div style={{ width: 30, height: 15, background: '#59FF93', display: 'inline-block', verticalAlign: 'middle' }}></div> : Hadir&emsp;
