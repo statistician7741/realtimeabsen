@@ -55,7 +55,7 @@ let runServer = () => {
       io.use(sharedsession(session, cookieParser("ID==&&%^&A&SHBJSAsjhbJGhUGkbKiUvii^%^#$%^&98G8UIugg==")));
       io.on('connection', function (client) {
         console.log("Hey, someone connected");
-        // require('./api/socket/penilaian.api.socket')(client, all_connected_clients)
+        require('./api/organik.socket.api')(client)
         client.on('disconnect', () => {
           console.log("Hey, someone disconnected");
         })
@@ -76,7 +76,7 @@ let runServer = () => {
       udpServer.on('message', (data, remote) => {
         let year, month, day, hour, min, sec, UserID;
         async.auto({
-          id: (cb_1) => {
+          id_fingerprint: (cb_1) => {
             f.setVal(data, f.getUserID, cb_1);
           },
           year: (cb_1) => {
@@ -99,11 +99,24 @@ let runServer = () => {
           }
         }, (err, log) => {
           let checkInDate = moment(`${log.year}/${log.month}/${log.day} ${log.hour}:${log.min}:${log.sec}`, 'YYYY/M/D HH:mm:ss')
-          if (!checkInDate.isBefore(moment().subtract(2, 'second'))) {
-            console.log(log.id, checkInDate.format('YYYY/MM/DD hh:mm:ss'));
+          io.sockets.emit('last_fingerprint_online', moment().format('YYYY/MM/DD HH:mm:ss'));
+          if (!checkInDate.isBefore(moment().subtract(2, 'second')) && log.id_fingerprint && log.sec) {
             io.sockets.emit('checkin', {
-              id: log.id, time: checkInDate
+              id_fingerprint: log.id_fingerprint, new_handkey_time: checkInDate.format('YYYY/MM/DD HH:mm:ss')
             });
+            const presensi_id = moment().format('YYYY_MM_DD')
+            Organik.findOne({
+              'id_fingerprint': log.id_fingerprint, "presensi._id": presensi_id
+            }, (e, r) => {
+              if (e) {
+                console.log(e);
+              } else {
+                r.presensi[r.presensi.length-1].handkey_time.push(checkInDate.format('YYYY/MM/DD HH:mm:ss'))
+                console.log(r.presensi);
+                r.save()
+                console.log(log.id_fingerprint, checkInDate.format('YYYY/MM/DD HH:mm:ss'));
+              }
+            })
           }
         })
       });
@@ -111,9 +124,12 @@ let runServer = () => {
 }
 
 //modul mongodb utk koneksi mongo db database
-var url = 'mongodb://127.0.0.1:27017/presensi';
+const config = require('./config/env.config')
+var url = `mongodb://${config.db_server}:${config.port_server}/${config.db_name}`;
 var mongoose = require('mongoose');
 const { exec } = require('child_process');
+//Model
+const Organik = require('./models/organik.model')
 
 let start = () => {
   mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
