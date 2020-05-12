@@ -278,7 +278,7 @@ class Index extends React.Component {
         onChange={isFull => this.setState({ isFull })}
         style={{ background: 'inherit' }}
       >
-        <Row justify="center" align="bottom" gutter={16} onClick={() => this.setState({ isFull: !isFull })}>
+        <Row justify="center" align="bottom" onClick={() => this.setState({ isFull: !isFull })}>
           <Col>
             <span style={{ fontSize: 20 }}><strong>{time.format('dddd, DD MMMM YYYY')}</strong></span>
           </Col>
@@ -291,7 +291,7 @@ class Index extends React.Component {
             <Badge status={`${isOnline ? 'processing' : 'error'}`} text={`Mesin Presensi ${isOnline ? 'Online' : 'Offline'}`} />
           </Col>
         </Row>
-        <Row gutter={2}>
+        <Row>
           {organik_all.map(d =>
             <Col span={6} key={d._id}>
               <Card bodyStyle={{
