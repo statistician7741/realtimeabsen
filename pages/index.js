@@ -6,15 +6,23 @@ import { connect } from 'react-redux';
 import Fullscreen from "react-full-screen";
 import { setOrganik, setNewHandkey } from "../redux/actions/organik.action"
 import _ from 'lodash'
+import TextyAnim from 'rc-texty'
 moment.locale('id')
 
 const { Title } = Typography;
+
+const hijau = "#20BDA1"
+const merah = "#FB2162"
+const orange = "#FB6660"
+const hitam = "#0C4056"
 
 class Index extends React.Component {
   state = {
     isFull: false,
     last_fingerprint_online: undefined,
     isOnline: false,
+    message: 'Sudahkah Anda Handkey?',
+    showMsg: true,
     today: moment().day(),
     time: moment(),
     users: [
@@ -202,6 +210,29 @@ class Index extends React.Component {
           handkey_time: [moment().hour(7).minute(59).second(59), moment().hour(12).minute(59).second(59)]
         }
       }
+    ],
+    msgs: [
+      'Sudahkah Anda Handkey?',
+      'Badan Pusat Statistik',
+      'Visi: Pelopor data statistik terpercaya untuk semua',
+      'PROFESIONAL, INTEGRITAS, AMANAH',
+      'PROFESIONAL:',
+      'kompeten',
+      'efektif',
+      'efisien',
+      'inovatif',
+      'sistemik',
+      'INTEGRITAS:',
+      'dedikasi',
+      'disiplin',
+      'konsisten',
+      'terbuka',
+      'akuntabel',
+      'AMANAH:',
+      'terpercaya',
+      'jujur',
+      'tulus',
+      'adil'
     ]
   }
   handleCheckIn = (newUserPresensi) => {
@@ -247,6 +278,22 @@ class Index extends React.Component {
     dispatch(setOrganik(socket))
   }
 
+  runTextAnimation = () => {
+    setTimeout(() => this.setState({ showMsg: !this.state.showMsg }, () => {
+      this.runTextAnimation();
+      setTimeout(() => {
+        let pos = 0;
+        for (let i = 0; i < this.state.msgs.length; i++) {
+          if (this.state.msgs[i] === this.state.message) {
+            pos = i + 1;
+            if (pos > this.state.msgs.length-1) pos = 0;
+          }
+        }
+        this.setState({ showMsg: true, message: this.state.msgs[pos] })
+      }, this.state.message.split('').length * 50);
+    }), 4000);
+  }
+
   componentDidMount = () => {
     this.interval = setInterval(() => {
       this.setState({ time: moment() }, () => {
@@ -260,6 +307,7 @@ class Index extends React.Component {
         }
       })
     }, 1000);
+    this.runTextAnimation()
     setTimeout(() => {
       this.props.socket.on('checkin', this.handleCheckIn)
       this.props.socket.on('last_fingerprint_online', (last_fingerprint_online) => this.setState({ isOnline: true, last_fingerprint_online: moment(last_fingerprint_online, 'YYYY/MM/DD HH:mm:ss') }))
@@ -270,7 +318,7 @@ class Index extends React.Component {
     clearInterval(this.interval);
   }
   render() {
-    const { time, isOnline, isFull } = this.state;
+    const { time, isOnline, isFull, message, showMsg } = this.state;
     const { organik_all } = this.props;
     return <Fragment>
       <Fullscreen
@@ -280,10 +328,10 @@ class Index extends React.Component {
       >
         <Row justify="center" align="bottom" onClick={() => this.setState({ isFull: !isFull })}>
           <Col>
-            <span style={{ fontSize: 20 }}><strong>{time.format('dddd, DD MMMM YYYY')}</strong></span>
+            <span style={{ fontSize: 20, color: hitam }}><strong>{time.format('dddd, DD MMMM YYYY')}</strong></span>
           </Col>
           <Col>
-            <span style={{ fontSize: 60, color: `${time.isAfter(moment(time).hour(16).minute(time.day() === 5 ? 30 : 0).second(0)) || time.isBefore(moment(time).hour(7).minute(29).second(59)) ? '#87BF4E' : '#F26E22'}` }}>
+            <span style={{ fontSize: 80, margin: "0 25px", color: `${time.isAfter(moment(time).hour(16).minute(time.day() === 5 ? 30 : 0).second(0)) || time.isBefore(moment(time).hour(7).minute(29).second(59)) ? hijau : orange}` }}>
               <strong>{time.format('HH:mm:ss')}</strong>
             </span>
           </Col>
@@ -298,10 +346,10 @@ class Index extends React.Component {
                 backgroundColor: this.getPresensi(d.presensi.handkey_time, time).pulang ? (
                   this.getPresensi(d.presensi.handkey_time, time).pulang.isAfter(moment(time).hour(16).minute(time.day() === 5 ? 30 : 0).second(0)) ? '#A1B8BC' : '#59FF93'
                 ) : (
-                    this.getPresensi(d.presensi.handkey_time, time).datang ? '#59FF93' : '#FF7772'
+                    this.getPresensi(d.presensi.handkey_time, time).datang ? '#59FF93' : orange
                   ), padding: 5
               }}>
-                <span><strong>{d.nama}</strong></span><br />
+                <span style={{ fontSize: 20, color: hitam }}><strong>{d.nama}</strong></span><br />
                 <span>Datang: {this.getPresensi(d.presensi.handkey_time, time).datang ? this.getPresensi(d.presensi.handkey_time, time).datang.format('HH:mm:ss') : '-'}</span><br />
                 <span>Pulang: {this.getPresensi(d.presensi.handkey_time, time).pulang ? this.getPresensi(d.presensi.handkey_time, time).pulang.format('HH:mm:ss') : '-'}</span>
               </Card>
@@ -309,17 +357,22 @@ class Index extends React.Component {
           )}
         </Row>
         <div style={{ paddingLeft: 10 }}>
-          Keterangan:<br />
+          <strong>Keterangan</strong><br />
           <div style={{ display: 'inline-block' }}>
-            <div style={{ width: 30, height: 15, background: '#FF7772', display: 'inline-block', verticalAlign: 'middle' }}></div> : Belum Hadir&emsp;
-        </div>
-          <div style={{ display: 'inline-block' }}>
-            <div style={{ width: 30, height: 15, background: '#59FF93', display: 'inline-block', verticalAlign: 'middle' }}></div> : Hadir&emsp;
+            <div style={{ width: 30, height: 15, background: orange, display: 'inline-block', verticalAlign: 'middle' }}></div> Belum Hadir&emsp;
         </div>
           <div style={{ display: 'inline-block' }}>
-            <div style={{ width: 30, height: 15, background: '#A1B8BC', display: 'inline-block', verticalAlign: 'middle' }}></div> : Pulang&emsp;
+            <div style={{ width: 30, height: 15, background: hijau, display: 'inline-block', verticalAlign: 'middle' }}></div> Hadir&emsp;
+        </div>
+          <div style={{ display: 'inline-block' }}>
+            <div style={{ width: 30, height: 15, background: '#A1B8BC', display: 'inline-block', verticalAlign: 'middle' }}></div> Pulang&emsp;
         </div>
         </div>
+        <Row justify="center" align="bottom">
+          <Col>
+            <TextyAnim type="right" mode="smooth" interval={50} duration={450} style={{ fontSize: 30, color: hijau }}>{showMsg && message}</TextyAnim>
+          </Col>
+        </Row>
       </Fullscreen>
     </Fragment>
   }
