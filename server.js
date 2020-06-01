@@ -100,7 +100,7 @@ let runServer = () => {
         }, (err, log) => {
           let checkInDate = moment(`${log.year}/${log.month}/${log.day} ${log.hour}:${log.min}:${log.sec}`, 'YYYY/M/D HH:mm:ss')
           io.sockets.emit('last_fingerprint_online', moment().format('YYYY/MM/DD HH:mm:ss'));
-          if (!checkInDate.isBefore(moment().subtract(2, 'second')) && log.id_fingerprint && log.sec) {
+          if (!checkInDate.isBefore(moment().subtract(5, 'm')) && log.id_fingerprint && log.sec) {
             io.sockets.emit('checkin', {
               id_fingerprint: log.id_fingerprint, new_handkey_time: checkInDate.format('YYYY/MM/DD HH:mm:ss')
             });
@@ -113,9 +113,7 @@ let runServer = () => {
               } else {
                 if (r.presensi[r.presensi.length - 1]._id === moment().format('YYYY_MM_DD')) {
                   r.presensi[r.presensi.length - 1].handkey_time.push(checkInDate.format('YYYY/MM/DD HH:mm:ss'))
-                  console.log(r.presensi);
                   r.save()
-                  console.log(log.id_fingerprint, checkInDate.format('YYYY/MM/DD HH:mm:ss'));
                 }
               }
             })
