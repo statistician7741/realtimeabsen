@@ -111,9 +111,27 @@ let runServer = () => {
               if (e) {
                 console.log(e);
               } else {
-                if (r.presensi[r.presensi.length - 1]._id === moment().format('YYYY_MM_DD')) {
-                  r.presensi[r.presensi.length - 1].handkey_time.push(checkInDate.format('YYYY/MM/DD HH:mm:ss'))
-                  r.save()
+                if (r) {
+                  if (r.presensi[r.presensi.length - 1]._id === moment().format('YYYY_MM_DD')) {
+                    r.presensi[r.presensi.length - 1].handkey_time.push(checkInDate.format('YYYY/MM/DD HH:mm:ss'))
+                    r.save()
+                  }
+                } else {
+                  Mitra.findOne({
+                    'id_fingerprint': log.id_fingerprint, "presensi._id": presensi_id
+                  }, (e, m) => {
+                    if (e) {
+                      console.log(e);
+                    } else {
+                      if (m) {
+                        if (m.presensi[m.presensi.length - 1]._id === moment().format('YYYY_MM_DD')) {
+                          m.presensi[m.presensi.length - 1].handkey_time.push(checkInDate.format('YYYY/MM/DD HH:mm:ss'))
+                          m.save()
+                          // console.log(log.id_fingerprint, checkInDate.format('YYYY/MM/DD HH:mm:ss'));
+                        }
+                      }
+                    }
+                  })
                 }
               }
             })
@@ -130,6 +148,7 @@ var mongoose = require('mongoose');
 const { exec } = require('child_process');
 //Model
 const Organik = require('./models/organik.model')
+const Mitra = require('./models/mitra.model')
 
 let start = () => {
   mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {

@@ -1,4 +1,5 @@
 import * as actionTypes from "../types/organik.type";
+import moment from 'moment'
 
 export default (
   state = {
@@ -14,11 +15,17 @@ export default (
         organik_all: action.new_organik_all
       }
     case actionTypes.SET_NEW_HANDKEY:
-      console.log(1111111111111);
       const usersTemp = [...state.organik_all];
       _.forEach(usersTemp, (user, i) => {
         if (user.id_fingerprint === action.id_fingerprint) {
-          user.presensi.handkey_time.push(action.new_handkey_time)//moment(action.new_handkey_time, 'YYYY/MM/DD HH:mm:ss'))
+          if(!user.isPpnpn) user.presensi.handkey_time.push(action.new_handkey_time)
+            else {
+              user.presensi.forEach((d_p, i)=>{
+                if(d_p._id === moment().format('YYYY_MM_DD')){
+                  user.presensi[i].handkey_time.push(action.new_handkey_time)
+                }
+              })
+            }
         }
       })
       return {
