@@ -65,16 +65,47 @@ function applyToClient(client) {
                                 }
                             }
                         }, (e, r) => {
-                            Mitra.find({
-                                'isPpnpn': true,
-                                'presensi': { "$elemMatch":{"_id":{"$in":[ _id, _id_prev_day ]}  }}
-
-                            }).sort('nama').exec((e, semua_mitra) => {
-                                // console.log(semua_mitra);
-                                if (semua_mitra) cb(semua_organik.concat(semua_mitra))
-                                // if (semua_mitra) cb(semua_organik)
-                                else cb([])
+                            Mitra.aggregate([
+                                { $unwind: "$presensi" },
+                                {
+                                    $match: {
+                                        "presensi._id": _id,
+                                        'isPpnpn': true
+                
+                                    }
+                                }
+                            ]).sort('nama').exec((e, semua_mitra_hrini) => {
+                                Mitra.aggregate([
+                                    { $unwind: "$presensi" },
+                                    {
+                                        $match: {
+                                            "presensi._id": _id_prev_day,
+                                            'isPpnpn': true
+                    
+                                        }
+                                    }
+                                ]).sort('nama').exec((e, semua_mitra_kemarin) => {
+                                    let semua_mitra = [];
+                                    semua_mitra_hrini.forEach((m, i)=>{
+                                        semua_mitra.push({
+                                            _id: m._id,
+                                            nama: m.nama,
+                                            isPpnpn: true,
+                                            presensi: [m.presensi, semua_mitra_kemarin[i].presensi]
+                                        })
+                                    })
+                                    // console.log(semua_mitra);
+                                    if (semua_mitra) cb(semua_organik.concat(semua_mitra))
+                                    // if (semua_mitra) cb(semua_organik)
+                                    else cb([])
+                                })
                             })
+                            // Mitra.find({
+                            //     'isPpnpn': true,
+                            //     'presensi': { "$elemMatch":{"_id":{"$in":[ _id, _id_prev_day ]}  }}
+
+                            // }).sort('nama').exec((e, semua_mitra) => {
+                            // })
                         })
                     })
                 }
