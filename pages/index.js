@@ -136,7 +136,7 @@ class Index extends React.Component {
               _mid = t
             }
           })
-          return _mid?moment(_mid, 'YYYY/MM/DD HH:mm:ss'):_mid
+          return _mid ? moment(_mid, 'YYYY/MM/DD HH:mm:ss') : _mid
         })(),
         pulang: isAfter1330 ? moment(presensiArray[presensiArray.length - 1], 'YYYY/MM/DD HH:mm:ss') : undefined,
       }
@@ -205,7 +205,7 @@ class Index extends React.Component {
               _datang = t
             }
           })
-          return _datang?moment(_datang, 'YYYY/MM/DD HH:mm:ss'):_datang
+          return _datang ? moment(_datang, 'YYYY/MM/DD HH:mm:ss') : _datang
         })(),
         mid: (() => {
           let _mid = undefined;
@@ -225,7 +225,7 @@ class Index extends React.Component {
               _mid = t
             }
           })
-          return _mid?moment(_mid, 'YYYY/MM/DD HH:mm:ss'):_mid
+          return _mid ? moment(_mid, 'YYYY/MM/DD HH:mm:ss') : _mid
         })(),
         pulang: (() => {
           let _pulang = undefined;
@@ -237,7 +237,7 @@ class Index extends React.Component {
               _pulang = t
             }
           })
-          return _pulang?moment(_pulang, 'YYYY/MM/DD HH:mm:ss'):_pulang
+          return _pulang ? moment(_pulang, 'YYYY/MM/DD HH:mm:ss') : _pulang
         })()
       }
     } else {
@@ -252,7 +252,7 @@ class Index extends React.Component {
               _datang = t
             }
           })
-          return _datang?moment(_datang, 'YYYY/MM/DD HH:mm:ss'):_datang
+          return _datang ? moment(_datang, 'YYYY/MM/DD HH:mm:ss') : _datang
         })(),
         mid: (() => {
           let _mid = undefined;
@@ -264,7 +264,7 @@ class Index extends React.Component {
               _mid = t
             }
           })
-          return _mid?moment(_mid, 'YYYY/MM/DD HH:mm:ss'):_mid
+          return _mid ? moment(_mid, 'YYYY/MM/DD HH:mm:ss') : _mid
         })(),
         pulang: undefined
       }
@@ -283,13 +283,13 @@ class Index extends React.Component {
     if (!this.isShiftMalam(presensi))
       return this.getBgColorNormal(this.getAllDayHandkey(presensi).today, time)
     return moment(time).isAfter(moment(time).hour(1).minute(29).second(59)) && moment(time).isBefore(moment(time).hour(11).minute(30).second(0)) ? (
-      this.getPresensiShift(presensi, time).pulang && moment(time).isAfter(moment(time).hour(7).minute(29).second(59)) ? hijau : (moment(time).isBefore(moment(time).hour(7).minute(29).second(59))?hijau:orange)
+      this.getPresensiShift(presensi, time).pulang && moment(time).isAfter(moment(time).hour(7).minute(29).second(59)) ? hijau : (moment(time).isBefore(moment(time).hour(7).minute(29).second(59)) ? hijau : orange)
     ) : (
-      (moment(time).isAfter(moment(time).hour(23).minute(29).second(59)) && moment(time).isBefore(moment(time).hour(23).minute(59).second(59))) ||
-      (moment(time).isAfter(moment(time).hour(0).minute(0).second(0)) && moment(time).isBefore(moment(time).hour(1).minute(30).second(0))
-    ) ?
-    (this.getPresensiShift(presensi, time).mid ? hijau : orange)
-    : (this.getPresensiShift(presensi, time).datang && moment(time).isBetween(moment(time).hour(17).minute(59).second(59), moment(time).hour(23).minute(29).second(59)) ? hijau : orange))
+        (moment(time).isAfter(moment(time).hour(23).minute(29).second(59)) && moment(time).isBefore(moment(time).hour(23).minute(59).second(59))) ||
+          (moment(time).isAfter(moment(time).hour(0).minute(0).second(0)) && moment(time).isBefore(moment(time).hour(1).minute(30).second(0))
+          ) ?
+          (this.getPresensiShift(presensi, time).mid ? hijau : orange)
+          : (this.getPresensiShift(presensi, time).datang && moment(time).isBetween(moment(time).hour(17).minute(59).second(59), moment(time).hour(23).minute(29).second(59)) ? hijau : orange))
   }
 
   getAllOrg = () => {
@@ -349,17 +349,27 @@ class Index extends React.Component {
         onChange={isFull => this.setState({ isFull })}
         style={{ background: 'inherit' }}
       >
-        <Row justify="center" align="bottom" onClick={() => this.setState({ isFull: !isFull })}>
-          <Col>
-            <span style={{ fontSize: 20, color: hitam }}><strong>{time.format('dddd, DD MMMM YYYY')}</strong></span>
+        <Row onClick={() => this.setState({ isFull: !isFull })} align="middle">
+          <Col xs={24} md={4}>
+            <img src={`/static/bps.png`} className={'logo-bps'} />
           </Col>
-          <Col>
-            <span style={{ fontSize: 80, margin: "0 25px", color: `${time.isAfter(moment(time).hour(time.day() === 5 ? 16 : 15).minute(time.day() === 5 ? 29 : 59).second(59)) || time.isBefore(moment(time).hour(7).minute(30).second(0)) ? hijau2 : orange}` }}>
-              <strong>{time.format('HH:mm:ss')}</strong>
-            </span>
+          <Col xs={24} md={16}>
+            <Row justify="center" align="bottom">
+              <Col>
+                <span style={{ fontSize: 20, color: hitam }}><strong>{time.format('dddd, DD MMMM YYYY')}</strong></span>
+              </Col>
+              <Col>
+                <span style={{ fontSize: 80, margin: "0 25px", color: `${time.isAfter(moment(time).hour(time.day() === 5 ? 16 : 15).minute(time.day() === 5 ? 29 : 59).second(59)) || time.isBefore(moment(time).hour(7).minute(30).second(0)) ? hijau2 : orange}` }}>
+                  <strong>{time.format('HH:mm:ss')}</strong>
+                </span>
+              </Col>
+              <Col>
+                <Badge status={`${isOnline ? 'processing' : 'error'}`} text={`Mesin Presensi ${isOnline ? 'Online' : 'Offline'}`} />
+              </Col>
+            </Row>
           </Col>
-          <Col>
-            <Badge status={`${isOnline ? 'processing' : 'error'}`} text={`Mesin Presensi ${isOnline ? 'Online' : 'Offline'}`} />
+          <Col xs={24} md={4}>
+            <img src={`/static/logo.png`} className={'logo'} />
           </Col>
         </Row>
         {[undefined, true].map(b => <Row>
