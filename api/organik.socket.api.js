@@ -60,7 +60,7 @@ function applyToClient(client) {
                         }, {
                             $push: {
                                 presensi: {
-                                    _id_prev_day,
+                                    _id: _id_prev_day,
                                     handkey_time: []
                                 }
                             }
@@ -84,9 +84,10 @@ function applyToClient(client) {
                     
                                         }
                                     }
-                                ]).sort('nama').exec((e, semua_mitra_kemarin) => {
+                                ]).sort('nama').exec((er, semua_mitra_kemarin) => {
                                     let semua_mitra = [];
                                     semua_mitra_hrini.forEach((m, i)=>{
+                                        console.log(m, semua_mitra_kemarin,er);
                                         semua_mitra.push({
                                             _id: m._id,
                                             nama: m.nama,
