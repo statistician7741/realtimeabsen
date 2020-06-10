@@ -136,7 +136,7 @@ class Index extends React.Component {
               _mid = t
             }
           })
-          return moment(_mid, 'YYYY/MM/DD HH:mm:ss')
+          return _mid?moment(_mid, 'YYYY/MM/DD HH:mm:ss'):_mid
         })(),
         pulang: isAfter1330 ? moment(presensiArray[presensiArray.length - 1], 'YYYY/MM/DD HH:mm:ss') : undefined,
       }
