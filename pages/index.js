@@ -364,7 +364,7 @@ class Index extends React.Component {
         </Row>
         {[undefined, true].map(b => <Row>
           {organik_all.map(d =>
-            d.isPpnpn === b ? <Col span={6} key={d._id}>
+            d.isPpnpn === b ? <Col xs={24} md={12} lg={6} key={d._id}>
               <Card bodyStyle={{
                 backgroundColor: d.isPpnpn ? this.getBgColorShift(d.presensi, time) : this.getBgColorNormal(d.presensi.handkey_time, time)
                 , padding: 5

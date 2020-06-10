@@ -6,7 +6,6 @@ function applyToClient(client) {
     client.on('api.socket.organik/s/getOrganikAll', (cb) => {
         const _id = moment().format('YYYY_MM_DD')
         const _id_prev_day = moment().subtract(1,'day').format('YYYY_MM_DD')
-        console.log(_id, _id_prev_day);
         Organik.updateMany({
             'isProv': false,
             '$and': [
@@ -87,7 +86,6 @@ function applyToClient(client) {
                                 ]).sort('nama').exec((er, semua_mitra_kemarin) => {
                                     let semua_mitra = [];
                                     semua_mitra_hrini.forEach((m, i)=>{
-                                        console.log(m, semua_mitra_kemarin,er);
                                         semua_mitra.push({
                                             _id: m._id,
                                             nama: m.nama,
