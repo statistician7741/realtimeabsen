@@ -169,34 +169,24 @@ class Index extends React.Component {
     //CEK ABSEN KEMARIN
     //1. absen kemarin kosong dan ada absen pukul 
     if (!this.getAllDayHandkey(presensi).yest.length) {
-      let isUp1524andDown2005_found = false;
-      let isUp1124andDown1335_found = false
+      let isUp1830andDown2330_found = false;
       this.getAllDayHandkey(presensi).today.forEach(t => {
         if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-          moment(this.state.time).hour(15).minute(24).second(59),
-          moment(this.state.time).hour(20).minute(5).second(59)
-        )) isUp1524andDown2005_found = true
-        if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-          moment(this.state.time).hour(11).minute(24).second(59),
-          moment(this.state.time).hour(13).minute(35).second(59)
-        )) isUp1124andDown1335_found = true
+          moment(this.state.time).hour(18).minute(29).second(59),
+          moment(this.state.time).hour(23).minute(29).second(59)
+        )) isUp1830andDown2330_found = true
       })
-      return isUp1524andDown2005_found && !isUp1124andDown1335_found ? true : false
+      return isUp1830andDown2330_found ? true : false
     } else {
       //2. kemarin tidak ada absen di antara 15.24.59 - 18.05.59 dan tidak ada absen 11.25.59 - 13.35.59
-      let isUp1524andDown2005_found = false;
-      let isUp1124andDown1335_found = false;
+      let isUp1830andDown2330_found = false
       this.getAllDayHandkey(presensi).yest.forEach(t => {
         if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-          moment(this.state.time).subtract(1, 'day').hour(15).minute(24).second(59),
-          moment(this.state.time).subtract(1, 'day').hour(20).minute(5).second(59)
-        )) isUp1524andDown2005_found = true
-        if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-          moment(this.state.time).subtract(1, 'day').hour(11).minute(24).second(59),
-          moment(this.state.time).subtract(1, 'day').hour(13).minute(35).second(59)
-        )) isUp1124andDown1335_found = true
+          moment(this.state.time).subtract(1, 'day').hour(18).minute(29).second(59),
+          moment(this.state.time).subtract(1, 'day').hour(23).minute(29).second(59)
+        )) isUp1830andDown2330_found = true
       })
-      if (!isUp1524andDown2005_found && !isUp1124andDown1335_found) return false
+      if (!isUp1830andDown2330_found) return false
     }
     return true
   }
@@ -209,13 +199,13 @@ class Index extends React.Component {
           let _datang = undefined;
           this.getAllDayHandkey(presensi).yest.forEach(t => {
             if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).subtract(1, 'day').hour(15).minute(24).second(59),
-              moment(time).subtract(1, 'day').hour(20).minute(5).second(59)
+              moment(time).subtract(1, 'day').hour(17).minute(59).second(59),
+              moment(time).subtract(1, 'day').hour(23).minute(29).second(59)
             )) {
               _datang = t
             }
           })
-          return moment(_datang, 'YYYY/MM/DD HH:mm:ss')
+          return _datang?moment(_datang, 'YYYY/MM/DD HH:mm:ss'):_datang
         })(),
         mid: (() => {
           let _mid = undefined;
@@ -235,19 +225,19 @@ class Index extends React.Component {
               _mid = t
             }
           })
-          return moment(_mid, 'YYYY/MM/DD HH:mm:ss')
+          return _mid?moment(_mid, 'YYYY/MM/DD HH:mm:ss'):_mid
         })(),
         pulang: (() => {
           let _pulang = undefined;
           this.getAllDayHandkey(presensi).today.forEach(t => {
             if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).hour(7).minute(59).second(59),
+              moment(time).hour(7).minute(29).second(59),
               moment(time).hour(11).minute(30).second(0)
             )) {
               _pulang = t
             }
           })
-          return moment(_pulang, 'YYYY/MM/DD HH:mm:ss')
+          return _pulang?moment(_pulang, 'YYYY/MM/DD HH:mm:ss'):_pulang
         })()
       }
     } else {
@@ -256,8 +246,8 @@ class Index extends React.Component {
           let _datang = undefined;
           this.getAllDayHandkey(presensi).today.forEach(t => {
             if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).hour(15).minute(24).second(59),
-              moment(time).hour(20).minute(5).second(59)
+              moment(time).hour(17).minute(59).second(59),
+              moment(time).hour(23).minute(29).second(59)
             )) {
               _datang = t
             }
@@ -401,23 +391,23 @@ class Index extends React.Component {
                 </Row>
                 {!d.isPpnpn ? <Row justify="center" style={{ textAlign: "center" }}>
                   <Col xs={5}>
-                    {this.getPresensi(d.presensi.handkey_time, time).datang ? this.getPresensi(d.presensi.handkey_time, time).datang.format('HH:mm:ss') : '-'}
+                    {this.getPresensi(d.presensi.handkey_time, time).datang ? <strong>{this.getPresensi(d.presensi.handkey_time, time).datang.format('HH:mm:ss')}</strong> : '-'}
                   </Col>
                   <Col xs={5}>
-                    {this.getPresensi(d.presensi.handkey_time, time).mid ? this.getPresensi(d.presensi.handkey_time, time).mid.format('HH:mm:ss') : '-'}
+                    {this.getPresensi(d.presensi.handkey_time, time).mid ? <strong>{this.getPresensi(d.presensi.handkey_time, time).mid.format('HH:mm:ss')}</strong> : '-'}
                   </Col>
                   <Col xs={5}>
-                    {this.getPresensi(d.presensi.handkey_time, time).pulang ? this.getPresensi(d.presensi.handkey_time, time).pulang.format('HH:mm:ss') : '-'}
+                    {this.getPresensi(d.presensi.handkey_time, time).pulang ? <strong>{this.getPresensi(d.presensi.handkey_time, time).pulang.format('HH:mm:ss')}</strong> : '-'}
                   </Col>
                 </Row> : <Row justify="center" style={{ textAlign: "center" }}>
                     <Col xs={5}>
-                      {this.getPresensiShift(d.presensi, time).datang ? this.getPresensiShift(d.presensi, time).datang.format('HH:mm:ss') : '-'}
+                      {this.getPresensiShift(d.presensi, time).datang ? <strong>{this.getPresensiShift(d.presensi, time).datang.format('HH:mm:ss')}</strong> : '-'}
                     </Col>
                     <Col xs={5}>
-                      {this.getPresensiShift(d.presensi, time).mid ? this.getPresensiShift(d.presensi, time).mid.format('HH:mm:ss') : '-'}
+                      {this.getPresensiShift(d.presensi, time).mid ? <strong>{this.getPresensiShift(d.presensi, time).mid.format('HH:mm:ss')}</strong> : '-'}
                     </Col>
                     <Col xs={5}>
-                      {this.getPresensiShift(d.presensi, time).pulang ? this.getPresensiShift(d.presensi, time).pulang.format('HH:mm:ss') : '-'}
+                      {this.getPresensiShift(d.presensi, time).pulang ? <strong>{this.getPresensiShift(d.presensi, time).pulang.format('HH:mm:ss')}</strong> : '-'}
                     </Col>
                   </Row>}
               </Card>
