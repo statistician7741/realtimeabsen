@@ -252,7 +252,7 @@ class Index extends React.Component {
               _datang = t
             }
           })
-          return moment(_datang, 'YYYY/MM/DD HH:mm:ss')
+          return _datang?moment(_datang, 'YYYY/MM/DD HH:mm:ss'):_datang
         })(),
         mid: (() => {
           let _mid = undefined;
@@ -264,7 +264,7 @@ class Index extends React.Component {
               _mid = t
             }
           })
-          return moment(_mid, 'YYYY/MM/DD HH:mm:ss')
+          return _mid?moment(_mid, 'YYYY/MM/DD HH:mm:ss'):_mid
         })(),
         pulang: undefined
       }
@@ -283,13 +283,13 @@ class Index extends React.Component {
     if (!this.isShiftMalam(presensi))
       return this.getBgColorNormal(this.getAllDayHandkey(presensi).today, time)
     return moment(time).isAfter(moment(time).hour(1).minute(29).second(59)) && moment(time).isBefore(moment(time).hour(11).minute(30).second(0)) ? (
-      this.getPresensiShift(presensi, time).pulang && moment(time).isAfter(moment(time).hour(7).minute(59).second(59)) ? hijau : (moment(time).isBefore(moment(time).hour(7).minute(59).second(59))?hijau:orange)
+      this.getPresensiShift(presensi, time).pulang && moment(time).isAfter(moment(time).hour(7).minute(29).second(59)) ? hijau : (moment(time).isBefore(moment(time).hour(7).minute(29).second(59))?hijau:orange)
     ) : (
       (moment(time).isAfter(moment(time).hour(23).minute(29).second(59)) && moment(time).isBefore(moment(time).hour(23).minute(59).second(59))) ||
       (moment(time).isAfter(moment(time).hour(0).minute(0).second(0)) && moment(time).isBefore(moment(time).hour(1).minute(30).second(0))
     ) ?
     (this.getPresensiShift(presensi, time).mid ? hijau : orange)
-    : (this.getPresensiShift(presensi, time).datang && moment(time).isBetween(moment(time).hour(15).minute(29).second(59), moment(time).hour(23).minute(29).second(59)) ? hijau : orange))
+    : (this.getPresensiShift(presensi, time).datang && moment(time).isBetween(moment(time).hour(17).minute(59).second(59), moment(time).hour(23).minute(29).second(59)) ? hijau : orange))
   }
 
   getAllOrg = () => {
