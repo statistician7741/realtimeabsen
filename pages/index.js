@@ -350,7 +350,7 @@ class Index extends React.Component {
         style={{ background: 'inherit' }}
       >
         <Row onClick={() => this.setState({ isFull: !isFull })} align="middle">
-          <Col xs={24} md={4}>
+          <Col xs={24} md={4} style={{textAlign: "center"}}>
             <img src={`/static/bps.png`} className={'logo-bps'} />
           </Col>
           <Col xs={24} md={16}>
@@ -368,7 +368,7 @@ class Index extends React.Component {
               </Col>
             </Row>
           </Col>
-          <Col xs={24} md={4}>
+          <Col xs={24} md={4} style={{textAlign: "center"}}>
             <img src={`/static/logo.png`} className={'logo'} />
           </Col>
         </Row>

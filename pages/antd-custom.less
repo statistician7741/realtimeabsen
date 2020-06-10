@@ -1,3 +1,4 @@
+@import "~antd/lib/style/themes/default.less";
 @primary-color: #1DA57A;
 
 @layout-header-height: 50px;
@@ -11,11 +12,26 @@
     background-color: #52c41a;
 }
 
-.logo-bps {
-    height         : 40px;
-    margin-left: 16px;
+@media screen and (max-width: @screen-sm) {
+    .logo-bps {
+        height     : 40px;
+    }
+
+    .logo {
+        height      : 70px;
+    }
 }
 
-.logo {
-    height         : 70px;
+@media screen and (min-width: @screen-md) {
+    .logo-bps {
+        height     : 40px;
+        float      : left;
+        margin-left: 16px;
+    }
+
+    .logo {
+        height      : 70px;
+        float       : right;
+        margin-right: 16px;
+    }
 }
