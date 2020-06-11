@@ -24,7 +24,7 @@ class Index extends React.Component {
     isFull: false,
     last_fingerprint_online: undefined,
     isOnline: false,
-    message: 'Sudahkah Anda Handkey?',
+    message: '',
     showMsg: true,
     today: moment().day(),
     time: moment(),
@@ -34,20 +34,20 @@ class Index extends React.Component {
       'Sudahkah Anda Handkey?',
       'Badan Pusat Statistik',
       'Visi: Pelopor data statistik terpercaya untuk semua',
-      'PROFESIONAL, INTEGRITAS, AMANAH',
-      'PROFESIONAL:',
+      'Profesional, Integritas, Amanah',
+      'Profesional:',
       'kompeten',
       'efektif',
       'efisien',
       'inovatif',
       'sistemik',
-      'INTEGRITAS:',
+      'Integritas:',
       'dedikasi',
       'disiplin',
       'konsisten',
       'terbuka',
       'akuntabel',
-      'AMANAH:',
+      'Amanah:',
       'terpercaya',
       'jujur',
       'tulus',
@@ -350,7 +350,7 @@ class Index extends React.Component {
         style={{ background: 'inherit' }}
       >
         <Row onClick={() => this.setState({ isFull: !isFull })} align="middle">
-          <Col xs={24} md={4} style={{textAlign: "center"}}>
+          <Col xs={24} md={4} style={{ textAlign: "center" }}>
             <img src={`/static/bps.png`} className={'logo-bps'} />
           </Col>
           <Col xs={24} md={16}>
@@ -368,7 +368,7 @@ class Index extends React.Component {
               </Col>
             </Row>
           </Col>
-          <Col xs={24} md={4} style={{textAlign: "center"}}>
+          <Col xs={24} md={4} style={{ textAlign: "center" }}>
             <img src={`/static/logo.png`} className={'logo'} />
           </Col>
         </Row>
@@ -434,8 +434,8 @@ class Index extends React.Component {
         </div>
         </div>
         <Row justify="center" align="bottom">
-          <Col>
-            <TextyAnim type="right" mode="smooth" interval={50} duration={450} style={{ fontSize: 30, color: hijau2 }}>{showMsg && message}</TextyAnim>
+          <Col style={{ textAlign: "center" }}>
+            <TextyAnim type="right" mode="smooth" style={{ fontSize: 30, color: hitam, fontFamily: '"Monotype Corsiva", Helvetica, sans-serif' }}>{showMsg && message}</TextyAnim>
           </Col>
         </Row>
       </Fullscreen>
