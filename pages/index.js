@@ -25,6 +25,7 @@ class Index extends React.Component {
     last_fingerprint_online: undefined,
     isOnline: false,
     message: '',
+    messageTemp: '',
     showMsg: true,
     today: moment().day(),
     time: moment(),
@@ -298,19 +299,21 @@ class Index extends React.Component {
   }
 
   runTextAnimation = () => {
-    setTimeout(() => this.setState({ showMsg: !this.state.showMsg }, () => {
-      this.runTextAnimation();
+    let pos = 0;
+    for (let i = 0; i < this.state.msgs.length; i++) {
+      if (this.state.msgs[i] === this.state.message) {
+        pos = i + 1;
+        if (pos > this.state.msgs.length - 1) pos = 0;
+      }
+    }
+    this.setState({ 
+      message: this.state.message === ''? this.state.messageTemp: '',
+      messageTemp: this.state.msgs[pos]
+     }, () => {
       setTimeout(() => {
-        let pos = 0;
-        for (let i = 0; i < this.state.msgs.length; i++) {
-          if (this.state.msgs[i] === this.state.message) {
-            pos = i + 1;
-            if (pos > this.state.msgs.length - 1) pos = 0;
-          }
-        }
-        this.setState({ showMsg: true, message: this.state.msgs[pos] })
-      }, this.state.message.split('').length * 50);
-    }), 4000);
+        this.runTextAnimation();
+      }, 4000);
+    })
   }
 
   componentDidMount = () => {
@@ -433,11 +436,11 @@ class Index extends React.Component {
             <div style={{ width: 15, height: 15, background: hijau, display: 'inline-block', verticalAlign: 'middle' }}></div> sudah handkey&emsp;
         </div>
         </div>
-        <Row justify="center" align="bottom">
+        {showMsg ? <Row justify="center" align="bottom">
           <Col style={{ textAlign: "center" }}>
-            <TextyAnim type="right" mode="smooth" style={{ fontSize: 30, color: hitam, fontFamily: '"Monotype Corsiva", Helvetica, sans-serif' }}>{showMsg && message}</TextyAnim>
+            <TextyAnim type="right" mode="smooth" style={{ fontSize: 30, color: hitam, fontFamily: '"Monotype Corsiva", Helvetica, sans-serif' }}>{message}</TextyAnim>
           </Col>
-        </Row>
+        </Row> : null}
       </Fullscreen>
     </Fragment>
   }
