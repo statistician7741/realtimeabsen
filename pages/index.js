@@ -311,6 +311,9 @@ class Index extends React.Component {
       messageTemp: this.state.msgs[pos]
      }, () => {
       setTimeout(() => {
+        this.setState({showMsg: this.state.message === ''?false:true})
+      }, 2000);
+      setTimeout(() => {
         this.runTextAnimation();
       }, 4000);
     })
