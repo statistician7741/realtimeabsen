@@ -300,22 +300,26 @@ class Index extends React.Component {
 
   runTextAnimation = () => {
     let pos = 0;
+    let prev_msg = this.state.message;
     for (let i = 0; i < this.state.msgs.length; i++) {
       if (this.state.msgs[i] === this.state.message) {
         pos = i + 1;
         if (pos > this.state.msgs.length - 1) pos = 0;
       }
     }
-    this.setState({ 
-      message: this.state.message === ''? this.state.messageTemp: '',
+    this.setState({
+      message: this.state.message === '' ? this.state.messageTemp : '',
       messageTemp: this.state.msgs[pos]
-     }, () => {
-      setTimeout(() => {
-        this.setState({showMsg: this.state.message === ''?false:true})
-      }, 2000);
+    }, () => {
+      //setiap brp detik diganti teksnya
       setTimeout(() => {
         this.runTextAnimation();
-      }, 4000);
+        //setiap brp detik dishow/hide
+        setTimeout(() => {
+          this.setState({ showMsg: this.state.message === '' ? false : true })
+          console.log(prev_msg);
+        }, this.state.message === '' ? 1000 : this.state.message.split('').length * 50);
+      }, this.state.message === '' ? 1000 : this.state.message.split('').length * 50 * 2);
     })
   }
 
