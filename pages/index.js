@@ -9,8 +9,7 @@ import { setOrganik, setNewHandkey } from "../redux/actions/organik.action"
 import _ from 'lodash'
 import TextyAnim from 'rc-texty'
 moment.locale('id')
-
-const { Title } = Typography;
+import async from 'async'
 
 const hijau = '#59FF93'
 const hijau2 = "#20BDA1"
@@ -25,7 +24,6 @@ class Index extends React.Component {
     last_fingerprint_online: undefined,
     isOnline: false,
     message: '',
-    messageTemp: '',
     showMsg: true,
     today: moment().day(),
     time: moment(),
@@ -299,27 +297,41 @@ class Index extends React.Component {
   }
 
   runTextAnimation = () => {
-    let pos = 0;
-    let prev_msg = this.state.message;
-    for (let i = 0; i < this.state.msgs.length; i++) {
-      if (this.state.msgs[i] === this.state.message) {
-        pos = i + 1;
-        if (pos > this.state.msgs.length - 1) pos = 0;
+    async.series({
+      off: (cb) => {
+        this.setState({
+          showMsg: false,
+        }, () => {
+          setTimeout(() => {
+            cb(null, '1. off finish')
+          }, this.state.message.split('').length * 50 + 1000)
+        })
+      },
+      ganti: (cb) => {
+        let pos = 0;
+        for (let i = 0; i < this.state.msgs.length; i++) {
+          if (this.state.msgs[i] === this.state.message) {
+            pos = i + 1;
+            if (pos > this.state.msgs.length - 1) pos = 0;
+          }
+        }
+        this.setState({
+          message: this.state.msgs[pos],
+        }, () => {
+          cb(null, '2. ganti finish')
+        })
+      },
+      on: (cb) => {
+        this.setState({
+          showMsg: true,
+        }, () => {
+          setTimeout(() => {
+            cb(null, '1. on finish')
+          }, this.state.message.split('').length * 50)
+        })
       }
-    }
-    this.setState({
-      message: this.state.message === '' ? this.state.messageTemp : '',
-      messageTemp: this.state.msgs[pos]
-    }, () => {
-      //setiap brp detik diganti teksnya
-      setTimeout(() => {
-        this.runTextAnimation();
-        //setiap brp detik dishow/hide
-        setTimeout(() => {
-          this.setState({ showMsg: this.state.message === '' ? false : true })
-          console.log(prev_msg);
-        }, this.state.message === '' ? 1000 : this.state.message.split('').length * 50);
-      }, this.state.message === '' ? 1000 : this.state.message.split('').length * 50 * 2);
+    }, (err, finish) => {
+      this.runTextAnimation()
     })
   }
 
@@ -443,11 +455,11 @@ class Index extends React.Component {
             <div style={{ width: 15, height: 15, background: hijau, display: 'inline-block', verticalAlign: 'middle' }}></div> sudah handkey&emsp;
         </div>
         </div>
-        {showMsg ? <Row justify="center" align="bottom">
+        <Row justify="center" align="bottom">
           <Col style={{ textAlign: "center" }}>
-            <TextyAnim type="right" mode="smooth" style={{ fontSize: 30, color: hitam, fontFamily: '"Monotype Corsiva", Helvetica, sans-serif' }}>{message}</TextyAnim>
+            <TextyAnim type="right" mode="smooth" style={{ fontSize: 45, color: hitam, fontFamily: '"Monotype Corsiva", Helvetica, sans-serif' }}>{showMsg && message}</TextyAnim>
           </Col>
-        </Row> : null}
+        </Row>
       </Fullscreen>
     </Fragment>
   }
