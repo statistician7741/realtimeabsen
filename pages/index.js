@@ -359,11 +359,18 @@ class Index extends React.Component {
       })
     }, 1000);
     this.runTextAnimation()
-    setTimeout(() => {
+    if (this.props.socket) {
       this.props.socket.on('checkin', this.handleCheckIn)
       this.props.socket.on('last_fingerprint_online', (last_fingerprint_online) => this.setState({ isOnline: true, last_fingerprint_online: moment(last_fingerprint_online, 'YYYY/MM/DD HH:mm:ss') }))
       this.getAllOrg()
-    }, 2000)
+    }
+  }
+  componentDidUpdate(prevProps) {
+    if (this.props.socket !== prevProps.socket) {
+      this.props.socket.on('checkin', this.handleCheckIn)
+      this.props.socket.on('last_fingerprint_online', (last_fingerprint_online) => this.setState({ isOnline: true, last_fingerprint_online: moment(last_fingerprint_online, 'YYYY/MM/DD HH:mm:ss') }))
+      this.getAllOrg()
+    }
   }
   componentWillUnmount() {
     clearInterval(this.interval);
@@ -404,7 +411,7 @@ class Index extends React.Component {
           {organik_all.map(d =>
             d.isPpnpn === b ? <Col xs={24} md={12} lg={6} key={d._id}>
               <Card bodyStyle={{
-                backgroundColor: d.isPpnpn ? this.getBgColorShift(d.presensi, time) : this.getBgColorNormal(d.presensi.handkey_time, time)
+                backgroundColor: d.isPpnpn ? this.getBgColorShift(d.presensi, time) : this.props.spd_nip[d._id]?abuabu:this.getBgColorNormal(d.presensi.handkey_time, time)
                 , padding: 5
               }}>
                 <Row gutter={[0, 8]}>
@@ -456,10 +463,13 @@ class Index extends React.Component {
           <strong>keterangan</strong><br />
           <div style={{ display: 'inline-block' }}>
             <div style={{ width: 15, height: 15, background: orange, display: 'inline-block', verticalAlign: 'middle' }}></div> belum handkey&emsp;
-        </div>
+          </div>
           <div style={{ display: 'inline-block' }}>
             <div style={{ width: 15, height: 15, background: hijau, display: 'inline-block', verticalAlign: 'middle' }}></div> sudah handkey&emsp;
-        </div>
+          </div>
+          <div style={{ display: 'inline-block' }}>
+            <div style={{ width: 15, height: 15, background: abuabu, display: 'inline-block', verticalAlign: 'middle' }}></div> dinas luar&emsp;
+          </div>
         </div>
         <Row justify="center" align="bottom">
           <Col style={{ textAlign: "center" }}>
@@ -473,8 +483,8 @@ class Index extends React.Component {
 
 function mapStateToProps(state) {
   const { socket } = state.socket
-  const { organik_all } = state.organik
-  return { socket, organik_all }
+  const { organik_all, spd_nip } = state.organik
+  return { socket, organik_all, spd_nip }
 }
 
 export default connect(mapStateToProps)(Index)

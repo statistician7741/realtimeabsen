@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
-const getMoment = require('../functions/clientServerValid.function').getMoment
+const getMoment = (d) => {
+    return moment.isMoment(d) ? d : (/\d{2}\/\d{2}\/\d{4}/.test(d) ? moment(d, 'DD/MM/YYYY') : (d ? moment(d) : undefined))
+}
 const config = require('../config/env.config')
 
 var Schema = mongoose.Schema;
@@ -255,7 +257,7 @@ SPDSchema.virtual('email_bps_kab').get(function () {
 function dummyArr(jumlah) {
     let baris = []
     for (let index = 0; index < jumlah; index++) {
-        baris.push({loop: index, last: (index === jumlah-1)?true:false})
+        baris.push({ loop: index, last: (index === jumlah - 1) ? true : false })
     }
     return baris
 }
@@ -277,7 +279,7 @@ SPDSchema.virtual('page_break').get(function () {
         '<w:p><w:r><w:t></w:t></w:r></w:p>'
 });
 SPDSchema.virtual('akun').get(function () {
-    return this.anggaran?(this.anggaran.match(/52411\d{1}/)?this.anggaran.match(/52411\d{1}/)[0]:'524113'):'524113';
+    return this.anggaran ? (this.anggaran.match(/52411\d{1}/) ? this.anggaran.match(/52411\d{1}/)[0] : '524113') : '524113';
 });
 
 module.exports = mongoose.model('SPD', SPDSchema);
