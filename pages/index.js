@@ -25,6 +25,7 @@ class Index extends React.Component {
     isOnline: false,
     message: '',
     showMsg: true,
+    mountMsg: true,
     today: moment().day(),
     time: moment(),
     today_id: moment().format('YYYY_MM_DD'),
@@ -308,17 +309,22 @@ class Index extends React.Component {
         })
       },
       ganti: (cb) => {
-        let pos = 0;
-        for (let i = 0; i < this.state.msgs.length; i++) {
-          if (this.state.msgs[i] === this.state.message) {
-            pos = i + 1;
-            if (pos > this.state.msgs.length - 1) pos = 0;
-          }
-        }
         this.setState({
-          message: this.state.msgs[pos],
+          mountMsg: false,
         }, () => {
-          cb(null, '2. ganti finish')
+          let pos = 0;
+          for (let i = 0; i < this.state.msgs.length; i++) {
+            if (this.state.msgs[i] === this.state.message) {
+              pos = i + 1;
+              if (pos > this.state.msgs.length - 1) pos = 0;
+            }
+          }
+          this.setState({
+            message: this.state.msgs[pos],
+            mountMsg: true
+          }, () => {
+            cb(null, '2. ganti finish')
+          })
         })
       },
       on: (cb) => {
@@ -363,7 +369,7 @@ class Index extends React.Component {
     clearInterval(this.interval);
   }
   render() {
-    const { time, isOnline, isFull, message, showMsg } = this.state;
+    const { time, isOnline, isFull, message, showMsg, mountMsg } = this.state;
     const { organik_all } = this.props;
     return <Fragment>
       <Fullscreen
@@ -457,7 +463,7 @@ class Index extends React.Component {
         </div>
         <Row justify="center" align="bottom">
           <Col style={{ textAlign: "center" }}>
-            <TextyAnim type="right" mode="smooth" style={{ fontSize: 45, color: hitam, fontFamily: '"Monotype Corsiva", Helvetica, sans-serif' }}>{showMsg && message}</TextyAnim>
+            {mountMsg ? <TextyAnim type="right" mode="smooth" style={{ fontSize: 45, color: hitam, fontFamily: '"Monotype Corsiva", Helvetica, sans-serif' }}>{showMsg && message}</TextyAnim> : null}
           </Col>
         </Row>
       </Fullscreen>
