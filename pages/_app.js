@@ -6,6 +6,7 @@ import { Icon, message, notification } from 'antd'
 import { Provider } from 'react-redux'
 import React from 'react'
 import { setSocket } from '../redux/actions/socket.action'
+import { setOrganik } from '../redux/actions/organik.action'
 import withRedux from "next-redux-wrapper";
 
 import style from './_app.less';
@@ -37,23 +38,16 @@ class MyApp extends App {
     message.error(msg);
   }
 
-  handleOnDisconnect = () => {
-    notification.open({
-      message: 'Koneksi terputus',
-      description: 'Koneksi ke server terputus, mohon periksa internet Anda.',
-      icon: <Icon type="disconnect" />,
-      duration: 0
-    });
-  };
-
   handleOnConnect = () => {
-    notification.destroy()
+    const { store: {dispatch, getState} } = this.props;
+    dispatch(setOrganik(getState().socket.socket))
   };
 
   componentDidMount = () => {
     if (!this.props.store.getState().socket.socket) {
       const socket = io.connect(`http://${window.location.hostname}:82`);
       this.props.store.dispatch(setSocket(socket))
+      socket.on('connect', this.handleOnConnect)
     }
   }
 
