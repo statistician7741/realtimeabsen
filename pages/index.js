@@ -10,6 +10,7 @@ import _ from 'lodash'
 import TextyAnim from 'rc-texty'
 moment.locale('id')
 import async from 'async'
+import { shift_ppnpn } from '../config/env.config'
 
 const hijau = '#59FF93'
 const hijau2 = "#20BDA1"
@@ -165,35 +166,47 @@ class Index extends React.Component {
     }
   }
 
-  isShiftMalam = (presensi) => {
-    //CEK ABSEN KEMARIN
-    //1. absen kemarin kosong dan ada absen pukul 
-    if (!this.getAllDayHandkey(presensi).yest.length) {
-      let isUp1830andDown2330_found = false;
-      this.getAllDayHandkey(presensi).today.forEach(t => {
-        if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-          moment(this.state.time).hour(18).minute(29).second(59),
-          moment(this.state.time).hour(23).minute(29).second(59)
-        )) isUp1830andDown2330_found = true
-      })
-      return isUp1830andDown2330_found ? true : false
-    } else {
-      //2. kemarin tidak ada absen di antara 15.24.59 - 18.05.59 dan tidak ada absen 11.25.59 - 13.35.59
-      let isUp1830andDown2330_found = false
-      this.getAllDayHandkey(presensi).yest.forEach(t => {
-        if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-          moment(this.state.time).subtract(1, 'day').hour(18).minute(29).second(59),
-          moment(this.state.time).subtract(1, 'day').hour(23).minute(29).second(59)
-        )) isUp1830andDown2330_found = true
-      })
-      if (!isUp1830andDown2330_found) return false
-    }
-    return true
+  isShiftMalam = (name) => {
+    return this.state.time.isBetween(
+      moment(this.state.time).hour(7).minute(29).second(59),
+      moment(this.state.time).hour(17).minute(59).second(59)
+    ) ?
+      (shift_ppnpn[name][this.state.time.day()][0] ? false : shift_ppnpn[name][moment(this.state.time).subtract(1, 'day').day()][1])
+      : (shift_ppnpn[name][moment(this.state.time).subtract(1, 'day').day()][1] || shift_ppnpn[name][this.state.time.day()][1])
   }
 
-  getPresensiShift = (presensi, time) => {
-    if (!this.isShiftMalam(presensi)) return this.getPresensi(this.getAllDayHandkey(presensi).today, time)
-    if (this.getAllDayHandkey(presensi).yest.length > 0) {
+  getPresensiShift = (presensi, time, name) => {
+    if (!this.isShiftMalam(name)) return this.getPresensi(this.getAllDayHandkey(presensi).today, time)
+    const isUp1800 = time.isAfter(moment(time).hour(17).minute(59).second(59))
+    if (isUp1800) {
+      return {
+        datang: (() => {
+          let _datang = undefined;
+          this.getAllDayHandkey(presensi).today.forEach(t => {
+            if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
+              moment(time).hour(17).minute(59).second(59),
+              moment(time).hour(23).minute(29).second(59)
+            )) {
+              if (!_datang) _datang = t
+            }
+          })
+          return _datang ? moment(_datang, 'YYYY/MM/DD HH:mm:ss') : _datang
+        })(),
+        mid: (() => {
+          let _mid = undefined;
+          this.getAllDayHandkey(presensi).today.forEach(t => {
+            if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
+              moment(time).hour(23).minute(29).second(59),
+              moment(time).hour(23).minute(59).second(59)
+            )) {
+              _mid = t
+            }
+          })
+          return _mid ? moment(_mid, 'YYYY/MM/DD HH:mm:ss') : _mid
+        })(),
+        pulang: undefined
+      }
+    } else {
       return {
         datang: (() => {
           let _datang = undefined;
@@ -240,34 +253,6 @@ class Index extends React.Component {
           return _pulang ? moment(_pulang, 'YYYY/MM/DD HH:mm:ss') : _pulang
         })()
       }
-    } else {
-      return {
-        datang: (() => {
-          let _datang = undefined;
-          this.getAllDayHandkey(presensi).today.forEach(t => {
-            if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).hour(17).minute(59).second(59),
-              moment(time).hour(23).minute(29).second(59)
-            )) {
-              _datang = t
-            }
-          })
-          return _datang ? moment(_datang, 'YYYY/MM/DD HH:mm:ss') : _datang
-        })(),
-        mid: (() => {
-          let _mid = undefined;
-          this.getAllDayHandkey(presensi).today.forEach(t => {
-            if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).hour(23).minute(29).second(59),
-              moment(time).hour(23).minute(59).second(59)
-            )) {
-              _mid = t
-            }
-          })
-          return _mid ? moment(_mid, 'YYYY/MM/DD HH:mm:ss') : _mid
-        })(),
-        pulang: undefined
-      }
     }
   }
 
@@ -279,17 +264,17 @@ class Index extends React.Component {
     ) : (this.getPresensi(handkey_time, time).datang ? hijau : orange)
   }
 
-  getBgColorShift = (presensi, time) => {
-    if (!this.isShiftMalam(presensi))
+  getBgColorShift = (presensi, time, name) => {
+    if (!this.isShiftMalam(name))
       return this.getBgColorNormal(this.getAllDayHandkey(presensi).today, time)
     return moment(time).isAfter(moment(time).hour(1).minute(29).second(59)) && moment(time).isBefore(moment(time).hour(11).minute(30).second(0)) ? (
-      this.getPresensiShift(presensi, time).pulang && moment(time).isAfter(moment(time).hour(7).minute(29).second(59)) ? hijau : (moment(time).isBefore(moment(time).hour(7).minute(29).second(59)) ? hijau : orange)
+      this.getPresensiShift(presensi, time, name).pulang && moment(time).isAfter(moment(time).hour(7).minute(29).second(59)) ? hijau : (moment(time).isBefore(moment(time).hour(7).minute(29).second(59)) ? hijau : orange)
     ) : (
         (moment(time).isAfter(moment(time).hour(23).minute(29).second(59)) && moment(time).isBefore(moment(time).hour(23).minute(59).second(59))) ||
           (moment(time).isAfter(moment(time).hour(0).minute(0).second(0)) && moment(time).isBefore(moment(time).hour(1).minute(30).second(0))
           ) ?
-          (this.getPresensiShift(presensi, time).mid ? hijau : orange)
-          : (this.getPresensiShift(presensi, time).datang && moment(time).isBetween(moment(time).hour(17).minute(59).second(59), moment(time).hour(23).minute(29).second(59)) ? hijau : orange))
+          (this.getPresensiShift(presensi, time, name).mid ? hijau : orange)
+          : (this.getPresensiShift(presensi, time, name).datang && moment(time).isBetween(moment(time).hour(17).minute(59).second(59), moment(time).hour(23).minute(29).second(59)) ? hijau : orange))
   }
 
   getAllOrg = () => {
@@ -411,7 +396,7 @@ class Index extends React.Component {
           {organik_all.map(d =>
             d.isPpnpn === b ? <Col xs={24} md={12} lg={6} key={d._id}>
               <Card bodyStyle={{
-                backgroundColor: d.isPpnpn ? this.getBgColorShift(d.presensi, time) : this.props.spd_nip[d._id]?abuabu:this.getBgColorNormal(d.presensi.handkey_time, time)
+                backgroundColor: d.isPpnpn ? this.getBgColorShift(d.presensi, time, d.nama) : this.props.spd_nip[d._id] ? abuabu : this.getBgColorNormal(d.presensi.handkey_time, time)
                 , padding: 5
               }}>
                 <Row gutter={[0, 8]}>
@@ -421,12 +406,12 @@ class Index extends React.Component {
                 </Row>
                 <Row justify="center" style={{ textAlign: "center" }}>
                   <Col xs={5}>
-                    {d.isPpnpn === undefined || !this.isShiftMalam(d.presensi) ? <LoginOutlined /> : <Badge count={<CoffeeOutlined />} style={{ fontSize: 14 }}>
+                    {d.isPpnpn === undefined || !this.isShiftMalam(d.nama) ? <LoginOutlined /> : <Badge count={<CoffeeOutlined />} style={{ fontSize: 14 }}>
                       <LoginOutlined />
                     </Badge>}
                   </Col>
                   <Col xs={5}>
-                    {d.isPpnpn === undefined || !this.isShiftMalam(d.presensi) ? <ClockCircleOutlined rotate={-135} /> : <Badge count={<CoffeeOutlined />} style={{ fontSize: 14 }}>
+                    {d.isPpnpn === undefined || !this.isShiftMalam(d.nama) ? <ClockCircleOutlined rotate={-135} /> : <Badge count={<CoffeeOutlined />} style={{ fontSize: 14 }}>
                       <ClockCircleOutlined rotate={-135} />
                     </Badge>}
                   </Col>
@@ -446,13 +431,13 @@ class Index extends React.Component {
                   </Col>
                 </Row> : <Row justify="center" style={{ textAlign: "center" }}>
                     <Col xs={5}>
-                      {this.getPresensiShift(d.presensi, time).datang ? <strong>{this.getPresensiShift(d.presensi, time).datang.format('HH:mm:ss')}</strong> : '-'}
+                      {this.getPresensiShift(d.presensi, time, d.nama).datang ? <strong>{this.getPresensiShift(d.presensi, time, d.nama).datang.format('HH:mm:ss')}</strong> : '-'}
                     </Col>
                     <Col xs={5}>
-                      {this.getPresensiShift(d.presensi, time).mid ? <strong>{this.getPresensiShift(d.presensi, time).mid.format('HH:mm:ss')}</strong> : '-'}
+                      {this.getPresensiShift(d.presensi, time, d.nama).mid ? <strong>{this.getPresensiShift(d.presensi, time, d.nama).mid.format('HH:mm:ss')}</strong> : '-'}
                     </Col>
                     <Col xs={5}>
-                      {this.getPresensiShift(d.presensi, time).pulang ? <strong>{this.getPresensiShift(d.presensi, time).pulang.format('HH:mm:ss')}</strong> : '-'}
+                      {this.getPresensiShift(d.presensi, time, d.nama).pulang ? <strong>{this.getPresensiShift(d.presensi, time, d.nama).pulang.format('HH:mm:ss')}</strong> : '-'}
                     </Col>
                   </Row>}
               </Card>
