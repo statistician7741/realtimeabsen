@@ -363,11 +363,10 @@ class Index extends React.Component {
   render() {
     const { time, isOnline, isFull, message, showMsg, mountMsg } = this.state;
     const { organik_all } = this.props;
-    return <Fragment>
+    return <div style={{ minHeight: '140vh' }}>
       <Fullscreen
         enabled={this.state.isFull}
         onChange={isFull => this.setState({ isFull })}
-        style={{ background: 'inherit' }}
       >
         <Row onClick={() => this.setState({ isFull: !isFull })} align="middle">
           <Col xs={24} md={4} style={{ textAlign: "center" }}>
@@ -462,7 +461,7 @@ class Index extends React.Component {
           </Col>
         </Row>
       </Fullscreen>
-    </Fragment>
+    </div>
   }
 }
 
