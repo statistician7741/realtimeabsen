@@ -107,6 +107,7 @@ function applyToClient(client) {
                                                 _id: m._id,
                                                 nama: m.nama,
                                                 isPpnpn: true,
+                                                id_fingerprint: m.id_fingerprint,
                                                 presensi: [m.presensi, semua_mitra_kemarin[i].presensi]
                                             })
                                         })
