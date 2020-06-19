@@ -362,8 +362,8 @@ class Index extends React.Component {
   }
   render() {
     const { time, isOnline, isFull, message, showMsg, mountMsg } = this.state;
-    const { organik_all } = this.props;
-    return <div style={{ minHeight: '140vh' }}>
+    const { organik_all, router } = this.props;
+    return <div style={router.query.zoomin === "80"?{}:{ minHeight: '140vh' }}>
       <Fullscreen
         enabled={this.state.isFull}
         onChange={isFull => this.setState({ isFull })}

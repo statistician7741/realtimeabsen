@@ -19,6 +19,8 @@ class MyApp extends App {
       pageProps = await Component.getInitialProps(ctx)
     }
 
+    pageProps.router = router;
+
     return { pageProps }
   }
 
