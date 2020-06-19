@@ -34,7 +34,11 @@ class Index extends React.Component {
     msgs: [
       'Sudahkah Anda Handkey?',
       'Badan Pusat Statistik',
-      'Visi: Pelopor data statistik terpercaya untuk semua',
+      'Visi: Penyedia Data Statistik Berkualitas Untuk Indonesia Maju',
+      'Misi: 1. Menyediakan statistik berkualitas yang berstandar nasional dan internasional',
+      'Misi: 2. Membina K/L/D/I melalui Sistem Statistik Nasional yang berkesinambungan',
+      'Misi: 3. Mewujudkan pelayanan prima di bidang statistik untuk terwujudnya Sistem Statistik Nasional',
+      'Misi: 4. Membangun SDM yang unggul dan adaptif berlandaskan nilai profesionalisme, integritas dan amanah',
       'Profesional, Integritas, Amanah',
       'Profesional:',
       'kompeten',
@@ -363,7 +367,7 @@ class Index extends React.Component {
   render() {
     const { time, isOnline, isFull, message, showMsg, mountMsg } = this.state;
     const { organik_all, router } = this.props;
-    return <div style={router.query.zoomin === "80"?{}:{ minHeight: '140vh' }}>
+    return <div style={router.query.zoomin === "80"?{}:{ minHeight: '148vh' }}>
       <Fullscreen
         enabled={this.state.isFull}
         onChange={isFull => this.setState({ isFull })}
