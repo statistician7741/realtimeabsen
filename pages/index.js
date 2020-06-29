@@ -261,24 +261,47 @@ class Index extends React.Component {
   }
 
   getBgColorNormal = (handkey_time, time) => {
-    return moment(time).isAfter(moment(time).hour(11).minute(29).second(59)) ? (
-      moment(time).isAfter(moment(time).hour(time.day() === 5 ? 16 : 15).minute(time.day() === 5 ? 29 : 59).second(59)) ? (this.getPresensi(handkey_time, time).pulang ?
-        (this.getPresensi(handkey_time, time).pulang.isAfter(moment(time).hour(time.day() === 5 ? 16 : 15).minute(time.day() === 5 ? 29 : 59).second(59)) ? hijau : orange) : orange) :
-        (this.getPresensi(handkey_time, time).mid ? hijau : orange)
-    ) : (this.getPresensi(handkey_time, time).datang ? hijau : orange)
+    const isSetelah1130 = moment(time).isAfter(moment(time).hour(11).minute(29).second(59))
+    const isSetelah1600or1630 = moment(time).isAfter(moment(time).hour(time.day() === 5 ? 16 : 15).minute(time.day() === 5 ? 29 : 59).second(59))
+    const { datang, mid, pulang } =this.getPresensi(handkey_time, time)
+    return isSetelah1130 ? (
+      isSetelah1600or1630? (pulang ?
+        (pulang.isAfter(moment(time).hour(time.day() === 5 ? 16 : 15).minute(time.day() === 5 ? 29 : 59).second(59)) ? hijau : orange) : orange) :
+        (mid ? hijau : orange)
+    ) : (datang ? hijau : orange)
+  }
+
+  getBgColorNormalSatpam = (handkey_time, time) => {
+    const isSetelah1130 = moment(time).isAfter(moment(time).hour(11).minute(29).second(59))
+    const isSetelah1930 = moment(time).isAfter(moment(time).hour(19).minute(29).second(59))
+    const { datang, mid, pulang } =this.getPresensi(handkey_time, time)
+    return isSetelah1130 ? (
+      isSetelah1930? (pulang ?
+        (pulang.isAfter(moment(time).hour(19).minute(29).second(59)) ? hijau : orange) : orange) :
+        (mid ? hijau : orange)
+    ) : (datang ? hijau : orange)
   }
 
   getBgColorShift = (presensi, time, name) => {
     if (!this.isShiftMalam(name))
-      return this.getBgColorNormal(this.getAllDayHandkey(presensi).today, time)
-    return moment(time).isAfter(moment(time).hour(1).minute(29).second(59)) && moment(time).isBefore(moment(time).hour(11).minute(30).second(0)) ? (
-      this.getPresensiShift(presensi, time, name).pulang && moment(time).isAfter(moment(time).hour(7).minute(29).second(59)) ? hijau : (moment(time).isBefore(moment(time).hour(7).minute(29).second(59)) ? hijau : orange)
+      return shift_ppnpn[name][this.state.time.day()][2] === 'tipe1'?this.getBgColorNormalSatpam(this.getAllDayHandkey(presensi).today, time):this.getBgColorNormal(this.getAllDayHandkey(presensi).today, time)
+    const isSebelum0130 = moment(time).isBefore(moment(time).hour(1).minute(30).second(0))
+    const isSetelah0130 = moment(time).isAfter(moment(time).hour(1).minute(29).second(59))
+    const isSebelum1130 = moment(time).isBefore(moment(time).hour(11).minute(30).second(0))
+    const isSetelah0730 = moment(time).isAfter(moment(time).hour(7).minute(29).second(59))
+    const isSebelum0730 = moment(time).isBefore(moment(time).hour(7).minute(29).second(59))
+    const isSetelah2330 = moment(time).isAfter(moment(time).hour(23).minute(29).second(59))
+    const isSebelum2359 = moment(time).isBefore(moment(time).hour(23).minute(59).second(59))
+    const isSetelah0000 = moment(time).isAfter(moment(time).hour(0).minute(0).second(0))
+    const isAntara1800and2330 = moment(time).isBetween(moment(time).hour(17).minute(59).second(59), moment(time).hour(23).minute(29).second(59))
+    const { datang, mid, pulang } = this.getPresensiShift(presensi, time, name)
+    return isSetelah0130 && isSebelum1130 ? (
+      pulang && isSetelah0730 ? hijau : (isSebelum0730 && mid ? hijau : orange)
     ) : (
-        (moment(time).isAfter(moment(time).hour(23).minute(29).second(59)) && moment(time).isBefore(moment(time).hour(23).minute(59).second(59))) ||
-          (moment(time).isAfter(moment(time).hour(0).minute(0).second(0)) && moment(time).isBefore(moment(time).hour(1).minute(30).second(0))
-          ) ?
-          (this.getPresensiShift(presensi, time, name).mid ? hijau : orange)
-          : (this.getPresensiShift(presensi, time, name).datang && moment(time).isBetween(moment(time).hour(17).minute(59).second(59), moment(time).hour(23).minute(29).second(59)) ? hijau : orange))
+        (isSetelah2330 && isSebelum2359) ||
+          (isSetelah0000 && isSebelum0130) ?
+          (mid ? hijau : orange)
+          : (datang && isAntara1800and2330 ? hijau : orange))
   }
 
   getAllOrg = () => {
@@ -367,7 +390,7 @@ class Index extends React.Component {
   render() {
     const { time, isOnline, isFull, message, showMsg, mountMsg } = this.state;
     const { organik_all, router } = this.props;
-    return <div style={router.query.zoomin === "80"?{}:{ minHeight: '148vh' }}>
+    return <div style={router.query.zoomin === "80" ? {} : { minHeight: '148vh' }}>
       <Fullscreen
         enabled={this.state.isFull}
         onChange={isFull => this.setState({ isFull })}
