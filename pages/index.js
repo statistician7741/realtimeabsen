@@ -171,25 +171,36 @@ class Index extends React.Component {
   }
 
   isShiftMalam = (name) => {
+    const pukul0730 = moment(this.state.time).hour(7).minute(29).second(59)
+    const pukul1930 = moment(this.state.time).hour(19).minute(29).second(59)
+    const hari_ini = this.state.time.day()
+    const kemarin = moment(this.state.time).subtract(1, 'day').day()
+    const isHariIniShiftPagi = shift_ppnpn[name][hari_ini][0]
+    const isHariIniShiftMalam = shift_ppnpn[name][hari_ini][1]
+    const isKemarinShiftMalam = shift_ppnpn[name][kemarin][1]
     return this.state.time.isBetween(
-      moment(this.state.time).hour(7).minute(29).second(59),
-      moment(this.state.time).hour(17).minute(59).second(59)
+      pukul0730,
+      pukul1930
     ) ?
-      (shift_ppnpn[name][this.state.time.day()][0] ? false : shift_ppnpn[name][moment(this.state.time).subtract(1, 'day').day()][1])
-      : (shift_ppnpn[name][moment(this.state.time).subtract(1, 'day').day()][1] || shift_ppnpn[name][this.state.time.day()][1])
+      (isHariIniShiftPagi ? false : isKemarinShiftMalam)
+      : isHariIniShiftMalam
   }
 
   getPresensiShift = (presensi, time, name) => {
+    console.log(name, ', isShiftMalam:',this.isShiftMalam(name));
     if (!this.isShiftMalam(name)) return this.getPresensi(this.getAllDayHandkey(presensi).today, time)
-    const isUp1800 = time.isAfter(moment(time).hour(17).minute(59).second(59))
+    const pukul1800 = moment(time).hour(17).minute(59).second(59)
+    const pukul2330 = moment(time).hour(23).minute(29).second(59)
+    const pukul2359 = moment(time).hour(23).minute(59).second(59)
+    const isUp1800 = time.isAfter(pukul1800)
     if (isUp1800) {
       return {
         datang: (() => {
           let _datang = undefined;
           this.getAllDayHandkey(presensi).today.forEach(t => {
             if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).hour(17).minute(59).second(59),
-              moment(time).hour(23).minute(29).second(59)
+              pukul1800,
+              pukul2330
             )) {
               if (!_datang) _datang = t
             }
@@ -200,8 +211,8 @@ class Index extends React.Component {
           let _mid = undefined;
           this.getAllDayHandkey(presensi).today.forEach(t => {
             if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).hour(23).minute(29).second(59),
-              moment(time).hour(23).minute(59).second(59)
+              pukul2330,
+              pukul2359
             )) {
               _mid = t
             }
@@ -211,13 +222,19 @@ class Index extends React.Component {
         pulang: undefined
       }
     } else {
+      const pukul1800kemarin = moment(time).subtract(1, 'day').hour(17).minute(59).second(59)
+      const pukul2330kemarin = moment(time).subtract(1, 'day').hour(23).minute(29).second(59)
+      const pukul0130 = moment(time).hour(1).minute(30).second(0)
+      const pukul0730 = moment(time).hour(7).minute(29).second(59)
+      const pukul1130 = moment(time).hour(11).minute(30).second(0)
+      
       return {
         datang: (() => {
           let _datang = undefined;
           this.getAllDayHandkey(presensi).yest.forEach(t => {
             if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).subtract(1, 'day').hour(17).minute(59).second(59),
-              moment(time).subtract(1, 'day').hour(23).minute(29).second(59)
+              pukul1800kemarin,
+              pukul2330kemarin
             )) {
               _datang = t
             }
@@ -228,16 +245,16 @@ class Index extends React.Component {
           let _mid = undefined;
           this.getAllDayHandkey(presensi).yest.forEach(t => {
             if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).subtract(1, 'day').hour(23).minute(29).second(59),
-              moment(time).hour(1).minute(30).second(0)
+              pukul2330kemarin,
+              pukul0130
             )) {
               _mid = t
             }
           })
           this.getAllDayHandkey(presensi).today.forEach(t => {
             if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).subtract(1, 'day').hour(23).minute(29).second(59),
-              moment(time).hour(1).minute(30).second(0)
+              pukul2330kemarin,
+              pukul0130
             )) {
               _mid = t
             }
@@ -248,8 +265,8 @@ class Index extends React.Component {
           let _pulang = undefined;
           this.getAllDayHandkey(presensi).today.forEach(t => {
             if (moment(t, 'YYYY/MM/DD HH:mm:ss').isBetween(
-              moment(time).hour(7).minute(29).second(59),
-              moment(time).hour(11).minute(30).second(0)
+              pukul0730,
+              pukul1130
             )) {
               _pulang = t
             }
