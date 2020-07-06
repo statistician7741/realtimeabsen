@@ -171,6 +171,7 @@ class Index extends React.Component {
   }
 
   isShiftMalam = (name) => {
+    const pukul0000 = moment(this.state.time).hour(0).minute(0).second(0)
     const pukul0730 = moment(this.state.time).hour(7).minute(29).second(59)
     const pukul1930 = moment(this.state.time).hour(19).minute(29).second(59)
     const hari_ini = this.state.time.day()
@@ -183,11 +184,13 @@ class Index extends React.Component {
       pukul1930
     ) ?
       (isHariIniShiftPagi ? false : isKemarinShiftMalam)
-      : isHariIniShiftMalam
+      : (this.state.time.isBetween(
+        pukul0000,
+        pukul0730
+      )?isKemarinShiftMalam:isHariIniShiftMalam)
   }
 
   getPresensiShift = (presensi, time, name) => {
-    console.log(name, ', isShiftMalam:',this.isShiftMalam(name));
     if (!this.isShiftMalam(name)) return this.getPresensi(this.getAllDayHandkey(presensi).today, time)
     const pukul1800 = moment(time).hour(17).minute(59).second(59)
     const pukul2330 = moment(time).hour(23).minute(29).second(59)
