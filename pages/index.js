@@ -298,7 +298,7 @@ class Index extends React.Component {
     return isSetelah1130 ? (
       isSetelah1930? (pulang ?
         (pulang.isAfter(moment(time).hour(19).minute(29).second(59)) ? hijau : orange) : orange) :
-        (mid ? hijau : orange)
+        (mid || pulang ? hijau : orange)
     ) : (datang ? hijau : orange)
   }
 
