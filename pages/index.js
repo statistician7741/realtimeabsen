@@ -321,7 +321,7 @@ class Index extends React.Component {
         (isSetelah2330 && isSebelum2359) ||
           (isSetelah0000 && isSebelum0130) ?
           (mid ? hijau : orange)
-          : (datang && isAntara1800and2330 ? hijau : orange))
+          : (datang && isAntara1800and2330 ? hijau : (datang?hijau:orange)))
   }
 
   getAllOrg = () => {
